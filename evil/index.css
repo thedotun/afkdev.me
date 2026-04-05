@@ -1,0 +1,114 @@
+body.evil {
+    /* the gradient is gonna kill us all because it sso tuff.... */
+    isolation: isolate;
+}
+
+body.evil::before,
+body.evil::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+
+body.evil::before {
+    /* its subtle..*/
+    z-index: 0;
+    opacity: 0;
+    background-image: linear-gradient(167deg, #3a0206 0%, #7a0b12 45%, #1e0002 100%);
+    animation: evil-red-shift 10s ease-in-out forwards;
+}
+
+body.evil::after {
+    z-index: 1;
+    opacity: 0;
+    mix-blend-mode: screen;
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(255, 180, 180, 0.28), transparent 30%),
+        radial-gradient(circle at 75% 35%, rgba(255, 76, 76, 0.22), transparent 26%),
+        radial-gradient(circle at 50% 82%, rgba(132, 0, 0, 0.32), transparent 34%);
+    animation: evil-red-glow 10s ease-in-out forwards;
+}
+
+body.evil .header,
+body.evil .textnstuff {
+    animation: evil-text-shift 10s ease-in-out forwards;
+}
+
+body.evil .nav a {
+    animation: evil-link-shift 10s ease-in-out forwards;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    body.evil {
+        animation: evil-shake 170ms steps(2, end) 10s infinite;
+        transform-origin: center;
+    }
+}
+
+/* its animation... */
+@keyframes evil-red-shift {
+    0% {
+        opacity: 0;
+        filter: saturate(0.85);
+    }
+
+    100% {
+        opacity: 1;
+        filter: saturate(1.25);
+    }
+}
+
+@keyframes evil-red-glow {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes evil-text-shift {
+    0% {
+        color: #1f65aa;
+        text-shadow: none;
+    }
+
+    100% {
+        color: #ffd7d7;
+        text-shadow: 0 0 1.75rem rgba(255, 64, 64, 0.4);
+    }
+}
+
+@keyframes evil-link-shift {
+    0% {
+        color: #17324d;
+    }
+
+    100% {
+        color: #ffe0e0;
+    }
+}
+
+@keyframes evil-shake {
+    0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    25% {
+        transform: translate3d(-10px, 5px, 0) rotate(-0.4deg);
+    }
+
+    50% {
+        transform: translate3d(10px, -5px, 0) rotate(0.35deg);
+    }
+
+    75% {
+        transform: translate3d(-5px, -10px, 0) rotate(-0.3deg);
+    }
+
+    100% {
+        transform: translate3d(5px, 10px, 0) rotate(0.4deg);
+    }
+}

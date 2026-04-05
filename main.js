@@ -1,42 +1,70 @@
 const stage = document.querySelector(".logo-stage");
-const logo = document.getElementById("logo");
 const obstacleSelector = "[hit]";
+const items = [...document.querySelectorAll("[data-logo-item]")].map((element) => ({
+    element,
+    x: 0,
+    y: 0,
+    velocityX: 0,
+    velocityY: 0,
+    isPlaced: false,
+}));
 
-if (stage && logo) {
+if (stage && items.length) {
     // init mate
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const SPEED_INCREASE_PER_SECOND = 20;
-    const MAX_SPEED = 420;
+    // i removed the limit because its liek
+    // more fun
+    const MAX_SPEED = Infinity;
     let animationFrameId = 0;
     let lastTimestamp = 0;
-    let x = 0;
-    let y = 0;
-    let velocityX = 0;
-    let velocityY = 0;
 
     document.body.classList.add("is-animated");
 
-    function getBounds() {
+    function getBounds(item) {
         return {
-            maxX: Math.max(0, stage.clientWidth - logo.offsetWidth),
-            maxY: Math.max(0, stage.clientHeight - logo.offsetHeight),
+            maxX: Math.max(0, stage.clientWidth - item.element.offsetWidth),
+            maxY: Math.max(0, stage.clientHeight - item.element.offsetHeight),
         };
     }
 
-    function getObstacles() {
+    function getStageRelativeRect(element) {
+        const rect = element.getBoundingClientRect();
+        const stageRect = stage.getBoundingClientRect();
+
+        return {
+            left: rect.left - stageRect.left,
+            top: rect.top - stageRect.top,
+            right: rect.right - stageRect.left,
+            bottom: rect.bottom - stageRect.top,
+            width: rect.width,
+            height: rect.height,
+        };
+    }
+
+    function getStaticObstacles() {
         return [...document.querySelectorAll(obstacleSelector)]
-            .filter((element) => element !== logo && !logo.contains(element))
-            .map((element) => element.getBoundingClientRect())
+            .filter((element) => !items.some((item) => item.element === element || item.element.contains(element)))
+            .map((element) => getStageRelativeRect(element))
             .filter((rect) => rect.width > 0 && rect.height > 0);
     }
 
-    function getLogoRect(nextX = x, nextY = y) {
+    function getItemRect(item, nextX = item.x, nextY = item.y) {
         return {
             left: nextX,
             top: nextY,
-            right: nextX + logo.offsetWidth,
-            bottom: nextY + logo.offsetHeight,
+            right: nextX + item.element.offsetWidth,
+            bottom: nextY + item.element.offsetHeight,
+            width: item.element.offsetWidth,
+            height: item.element.offsetHeight,
         };
+    }
+
+    function getOtherItemObstacles(item, placedOnly = false) {
+        return items
+            .filter((otherItem) => otherItem !== item && (!placedOnly || otherItem.isPlaced))
+            .map((otherItem) => getItemRect(otherItem))
+            .filter((rect) => rect.width > 0 && rect.height > 0);
     }
 
     function intersects(rectA, rectB) {
@@ -48,18 +76,19 @@ if (stage && logo) {
         );
     }
 
-    function isSafePosition(nextX, nextY) {
-        const logoRect = getLogoRect(nextX, nextY);
+    function isSafePosition(item, nextX, nextY, placedOnly = false) {
+        const itemRect = getItemRect(item, nextX, nextY);
+        const obstacles = getStaticObstacles().concat(getOtherItemObstacles(item, placedOnly));
 
-        return getObstacles().every((obstacleRect) => !intersects(logoRect, obstacleRect));
+        return obstacles.every((obstacleRect) => !intersects(itemRect, obstacleRect));
     }
 
-    function render() {
-        logo.style.transform = `translate(${x}px, ${y}px)`;
+    function renderItem(item) {
+        item.element.style.transform = `translate(${item.x}px, ${item.y}px)`;
     }
 
-    function findSafeStartPosition() {
-        const { maxX, maxY } = getBounds();
+    function findSafeStartPosition(item) {
+        const { maxX, maxY } = getBounds(item);
         const fallbackPositions = [
             { x: maxX / 2, y: maxY / 2 },
             { x: 24, y: 24 },
@@ -72,7 +101,7 @@ if (stage && logo) {
             const candidateX = Math.random() * maxX;
             const candidateY = Math.random() * maxY;
 
-            if (isSafePosition(candidateX, candidateY)) {
+            if (isSafePosition(item, candidateX, candidateY, true)) {
                 return { x: candidateX, y: candidateY };
             }
         }
@@ -81,7 +110,7 @@ if (stage && logo) {
             const candidateX = Math.min(Math.max(fallback.x, 0), maxX);
             const candidateY = Math.min(Math.max(fallback.y, 0), maxY);
 
-            if (isSafePosition(candidateX, candidateY)) {
+            if (isSafePosition(item, candidateX, candidateY, true)) {
                 return { x: candidateX, y: candidateY };
             }
         }
@@ -89,26 +118,34 @@ if (stage && logo) {
         return { x: maxX / 2, y: maxY / 2 };
     }
 
-    function placeLogo() {
-        const position = findSafeStartPosition();
+    function placeItems() {
+        for (const item of items) {
+            item.isPlaced = false;
+        }
 
-        x = position.x;
-        y = position.y;
-        render();
+        for (const item of items) {
+            const position = findSafeStartPosition(item);
+
+            item.x = position.x;
+            item.y = position.y;
+            item.isPlaced = true;
+            renderItem(item);
+        }
     }
 
-    function setRandomVelocity() {
+    function setRandomVelocity(item) {
         const angle = (20 + Math.random() * 50) * (Math.PI / 180);
         const speed = 180 + Math.random() * 70;
         const xDirection = Math.random() < 0.5 ? -1 : 1;
         const yDirection = Math.random() < 0.5 ? -1 : 1;
+
         // who doesnt love Math.random()
-        velocityX = Math.cos(angle) * speed * xDirection;
-        velocityY = Math.sin(angle) * speed * yDirection;
+        item.velocityX = Math.cos(angle) * speed * xDirection;
+        item.velocityY = Math.sin(angle) * speed * yDirection;
     }
 
-    function increaseSpeed(deltaTime) {
-        const currentSpeed = Math.hypot(velocityX, velocityY);
+    function increaseSpeed(item, deltaTime) {
+        const currentSpeed = Math.hypot(item.velocityX, item.velocityY);
 
         if (!currentSpeed) {
             return;
@@ -125,73 +162,73 @@ if (stage && logo) {
 
         const scale = nextSpeed / currentSpeed;
 
-        velocityX *= scale;
-        velocityY *= scale;
+        item.velocityX *= scale;
+        item.velocityY *= scale;
     }
 
-    function resolveXCollision(nextX, obstacles) {
+    function resolveXCollision(item, nextX, obstacles) {
         let resolvedX = nextX;
-        const currentRect = getLogoRect(x, y);
+        const currentRect = getItemRect(item);
 
         for (const obstacle of obstacles) {
-            const nextRect = getLogoRect(resolvedX, y);
+            const nextRect = getItemRect(item, resolvedX, item.y);
 
             if (!intersects(nextRect, obstacle)) {
                 continue;
             }
 
-            if (velocityX > 0 && currentRect.right <= obstacle.left) {
-                resolvedX = obstacle.left - logo.offsetWidth;
-                velocityX = -Math.abs(velocityX);
-            } else if (velocityX < 0 && currentRect.left >= obstacle.right) {
+            if (item.velocityX > 0 && currentRect.right <= obstacle.left) {
+                resolvedX = obstacle.left - item.element.offsetWidth;
+                item.velocityX = -Math.abs(item.velocityX);
+            } else if (item.velocityX < 0 && currentRect.left >= obstacle.right) {
                 resolvedX = obstacle.right;
-                velocityX = Math.abs(velocityX);
+                item.velocityX = Math.abs(item.velocityX);
             }
         }
 
         return resolvedX;
     }
 
-    function resolveYCollision(nextY, obstacles) {
+    function resolveYCollision(item, nextY, obstacles) {
         let resolvedY = nextY;
-        const currentRect = getLogoRect(x, y);
+        const currentRect = getItemRect(item);
 
         for (const obstacle of obstacles) {
-            const nextRect = getLogoRect(x, resolvedY);
+            const nextRect = getItemRect(item, item.x, resolvedY);
 
             if (!intersects(nextRect, obstacle)) {
                 continue;
             }
 
-            if (velocityY > 0 && currentRect.bottom <= obstacle.top) {
-                resolvedY = obstacle.top - logo.offsetHeight;
-                velocityY = -Math.abs(velocityY);
-            } else if (velocityY < 0 && currentRect.top >= obstacle.bottom) {
+            if (item.velocityY > 0 && currentRect.bottom <= obstacle.top) {
+                resolvedY = obstacle.top - item.element.offsetHeight;
+                item.velocityY = -Math.abs(item.velocityY);
+            } else if (item.velocityY < 0 && currentRect.top >= obstacle.bottom) {
                 resolvedY = obstacle.bottom;
-                velocityY = Math.abs(velocityY);
+                item.velocityY = Math.abs(item.velocityY);
             }
         }
 
         return resolvedY;
     }
 
-    function keepWithinBounds() {
-        const { maxX, maxY } = getBounds();
+    function keepWithinBounds(item) {
+        const { maxX, maxY } = getBounds(item);
 
-        if (x <= 0) {
-            x = 0;
-            velocityX = Math.abs(velocityX);
-        } else if (x >= maxX) {
-            x = maxX;
-            velocityX = -Math.abs(velocityX);
+        if (item.x <= 0) {
+            item.x = 0;
+            item.velocityX = Math.abs(item.velocityX);
+        } else if (item.x >= maxX) {
+            item.x = maxX;
+            item.velocityX = -Math.abs(item.velocityX);
         }
 
-        if (y <= 0) {
-            y = 0;
-            velocityY = Math.abs(velocityY);
-        } else if (y >= maxY) {
-            y = maxY;
-            velocityY = -Math.abs(velocityY);
+        if (item.y <= 0) {
+            item.y = 0;
+            item.velocityY = Math.abs(item.velocityY);
+        } else if (item.y >= maxY) {
+            item.y = maxY;
+            item.velocityY = -Math.abs(item.velocityY);
         }
     }
 
@@ -201,53 +238,65 @@ if (stage && logo) {
         }
 
         const deltaTime = (timestamp - lastTimestamp) / 1000;
-        const obstacles = getObstacles();
+        const staticObstacles = getStaticObstacles();
 
         lastTimestamp = timestamp;
-        increaseSpeed(deltaTime);
 
-        x = resolveXCollision(x + velocityX * deltaTime, obstacles);
-        y = resolveYCollision(y + velocityY * deltaTime, obstacles);
-        keepWithinBounds();
-        render();
+        for (const item of items) {
+            const obstacles = staticObstacles.concat(getOtherItemObstacles(item));
+
+            increaseSpeed(item, deltaTime);
+            item.x = resolveXCollision(item, item.x + item.velocityX * deltaTime, obstacles);
+            item.y = resolveYCollision(item, item.y + item.velocityY * deltaTime, obstacles);
+            keepWithinBounds(item);
+            renderItem(item);
+        }
 
         animationFrameId = window.requestAnimationFrame(step);
     }
 
-    function startAniation() {
+    function startAnimation() {
         window.cancelAnimationFrame(animationFrameId);
         lastTimestamp = 0;
-        placeLogo();
+        placeItems();
 
         if (reducedMotion.matches) {
             return;
         }
 
-        setRandomVelocity();
+        for (const item of items) {
+            setRandomVelocity(item);
+        }
+
         animationFrameId = window.requestAnimationFrame(step);
     }
 
     function handleResize() {
-        const { maxX, maxY } = getBounds();
+        for (const item of items) {
+            const { maxX, maxY } = getBounds(item);
 
-        x = Math.min(Math.max(x, 0), maxX);
-        y = Math.min(Math.max(y, 0), maxY);
+            item.x = Math.min(Math.max(item.x, 0), maxX);
+            item.y = Math.min(Math.max(item.y, 0), maxY);
+            item.isPlaced = true;
+        }
 
-        if (!isSafePosition(x, y)) {
-            placeLogo();
+        if (items.some((item) => !isSafePosition(item, item.x, item.y))) {
+            placeItems();
             return;
         }
 
-        render();
+        for (const item of items) {
+            renderItem(item);
+        }
     }
 
     window.addEventListener("resize", handleResize);
 
     if (typeof reducedMotion.addEventListener === "function") {
-        reducedMotion.addEventListener("change", startAniation);
+        reducedMotion.addEventListener("change", startAnimation);
     } else {
-        reducedMotion.addListener(startAniation);
+        reducedMotion.addListener(startAnimation);
     }
 
-    startAniation();
+    startAnimation();
 }

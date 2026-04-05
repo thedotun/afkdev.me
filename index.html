@@ -5,6 +5,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>thedotun's website</title>
+        <!-- preperation ... -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/91/three.js"></script>
+        <meta property="og:title" content="dotun's title" />
+        <meta property="og:description" content="I'm dotun! Check out my website!" />
+        <meta property="og:url" content="https://afkdev.me" />
+        <meta property="og:image" content="assets/imdotun.png" />
+        <meta property="og:type" content="website" />
+        <meta name="theme-color" content="#00C1FF" />
         <link rel="stylesheet" href="index.css">
     </head>
 
@@ -21,15 +29,22 @@
             <p>i make things.</p>
         </div>
         <main class="logo-stage">
-            <div id="logo">
+            <div id="logo" class="logo-item" data-logo-item>
                 <a class="logo-link" href="https://github.com/thedotun/thedotun.github.io"
                     aria-label="the repo go ahead jwk look at it">
-                    <img src="thedotun.svg" alt="thedotun logo">
+                    <img src="assets/thedotun.svg" alt="thedotun logo">
                 </a>
             </div>
+            <div class="logo-item logo-item--three" data-logo-item>
+                <a class="logo-link" href="evil" aria-label="Open Dotun's GitHub profile">
+                    <canvas class="logo-canvas" aria-hidden="true"></canvas>
+                </a>
+            </div>
+
         </main>
 
         <script src="main.js"></script>
+        <script src="hypercube.js"></script>
     </body>
 
 </html>

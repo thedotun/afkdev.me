@@ -59,16 +59,24 @@ body {
     font-family: system-ui, sans-serif;
     font-size: clamp(1.5rem, 3vw, 2.5rem);
     font-weight: 600;
-    color: #17324d;
+    color: #1f65aa;
     text-align: center;
     z-index: 2;
+}
+
+.logo-item {
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 #logo {
     width: clamp(160px, 24vw, 280px);
     aspect-ratio: 659.58096 / 274.33268;
-    pointer-events: auto;
-    cursor: pointer;
+}
+
+.logo-item--three {
+    width: clamp(164px, 18vw, 210px);
+    aspect-ratio: 1;
 }
 
 .logo-link {
@@ -77,14 +85,22 @@ body {
     height: 100%;
 }
 
+.logo-item--three .logo-link {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: rgb(0, 255, 255);
+    box-shadow: 0 0.75rem 2rem rgba(23, 50, 77, 0.14);
+}
+
 #logo object,
-#logo img {
+#logo img,
+.logo-canvas {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-body.is-animated #logo {
+body.is-animated .logo-item {
     position: absolute;
     top: 0;
     left: 0;
