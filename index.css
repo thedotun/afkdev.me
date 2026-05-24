@@ -75,8 +75,8 @@ body {
 }
 
 .logo-item--three {
-    width: clamp(164px, 18vw, 210px);
-    aspect-ratio: 1;
+    width: clamp(180px, 20vw, 240px);
+    aspect-ratio: 500 / 500;
 }
 
 .logo-link {
@@ -88,8 +88,15 @@ body {
 .logo-item--three .logo-link {
     border-radius: 0.5rem;
     overflow: hidden;
-    background: rgb(0, 255, 255);
+    background: transparent;
     box-shadow: 0 0.75rem 2rem rgba(23, 50, 77, 0.14);
+}
+
+.logo-item--three .logo-link img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 #logo object,
