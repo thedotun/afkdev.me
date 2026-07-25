@@ -30,12 +30,12 @@ body.evil::after {
     animation: evil-red-glow 10s ease-in-out forwards;
 }
 
-body.evil .header,
-body.evil .textnstuff {
+.logo-stage.evil .header,
+.logo-stage.evil .textnstuff {
     animation: evil-text-shift 10s ease-in-out forwards;
 }
 
-body.evil .nav a {
+.logo-stage.evil .nav a {
     animation: evil-link-shift 10s ease-in-out forwards;
 }
 
