@@ -1,6 +1,5 @@
 export async function createHypercube(canvas) {
     const THREE = await import("three");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const vertices4D = [];
     const edges = [];
@@ -125,12 +124,6 @@ export async function createHypercube(canvas) {
     function startAnimation() {
         window.cancelAnimationFrame(animationFrameId);
         animationFrameId = 0;
-
-        if (reducedMotion.matches) {
-            renderStatic();
-            return;
-        }
-
         animationFrameId = window.requestAnimationFrame(renderFrame);
     }
 
@@ -165,14 +158,12 @@ export async function createHypercube(canvas) {
     scene.add(lines);
     scene.add(core);
     window.addEventListener("resize", renderStatic);
-    reducedMotion.addEventListener("change", startAnimation);
 
     startAnimation();
 
     return () => {
         window.cancelAnimationFrame(animationFrameId);
         window.removeEventListener("resize", renderStatic);
-        reducedMotion.removeEventListener("change", startAnimation);
         geometry.dispose();
         material.dispose();
         coreGeometry.dispose();

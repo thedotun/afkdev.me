@@ -15,7 +15,6 @@ export function createBounce(stage) {
     }
 
     // init mate
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const SPEED_INCREASE_PER_SECOND = 20;
     // i removed the limit because its liek
     // more fun
@@ -264,10 +263,6 @@ export function createBounce(stage) {
         lastTimestamp = 0;
         placeItems();
 
-        if (reducedMotion.matches) {
-            return;
-        }
-
         for (const item of items) {
             setRandomVelocity(item);
         }
@@ -295,14 +290,12 @@ export function createBounce(stage) {
     }
 
     window.addEventListener("resize", handleResize);
-    reducedMotion.addEventListener("change", startAnimation);
 
     startAnimation();
 
     return () => {
         window.cancelAnimationFrame(animationFrameId);
         window.removeEventListener("resize", handleResize);
-        reducedMotion.removeEventListener("change", startAnimation);
         document.body.classList.remove("is-animated");
     };
 }
