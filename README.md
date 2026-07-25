@@ -1,4 +1,4 @@
-# Hi
+# el website
 
-i know you're here...
-i actually updated it 11!!
+it used to be plain html/css but i ported it to sveltekit 
+`npm install` then `npm run dev`
