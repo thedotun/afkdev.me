@@ -25,6 +25,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: put git bash on PATH
+        shell: powershell
+        run: Add-Content $env:GITHUB_PATH "C:\Program Files\Git\bin"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build
