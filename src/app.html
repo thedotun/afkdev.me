@@ -3,6 +3,23 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			addEventListener('unhandledrejection', function (event) {
+				var message = (event.reason && event.reason.message) || '';
+				if (!/dynamically imported module|Importing a module script failed/i.test(message)) return;
+
+				try {
+					var key = 'sk:recovered-at';
+					if (Date.now() - (Number(sessionStorage.getItem(key)) || 0) < 10000) return;
+					sessionStorage.setItem(key, String(Date.now()));
+				} catch (error) {
+					return;
+				}
+
+				event.preventDefault();
+				location.reload();
+			});
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

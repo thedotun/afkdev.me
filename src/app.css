@@ -61,7 +61,7 @@ body {
     font-family: system-ui, sans-serif;
     font-size: clamp(1.5rem, 3vw, 2.5rem);
     font-weight: 600;
-    color: #888888;
+    color: #d4d4d4;
     text-align: center;
     z-index: 2;
 }

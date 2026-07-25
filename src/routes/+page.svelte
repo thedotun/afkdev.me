@@ -17,13 +17,16 @@
 </svelte:head>
 
 <div class="textnstuff" hit>
-  <h1>hi</h1>
-  <p>i make things.</p>
+  <h1>heya!</h1>
+  <p>
+    im xcd, and i make things. check out my work by clicking the bouncing
+    things!
+  </p>
 </div>
 <main class="logo-stage" bind:this={stage}>
   <div id="logo" class="logo-item" data-logo-item>
     <a class="logo-link" href="https://github.com/thedotun/afkdev.me">
-      <img src="/assets/thedotun.svg" alt="thedotun logo" />
+      <img src="/assets/xcdicongreek.svg" alt="thedotun logo" />
     </a>
   </div>
   <div class="logo-item logo-item--three" data-logo-item>
