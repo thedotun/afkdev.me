@@ -4,6 +4,11 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<script>
+			// on www its not https and i dont Like That but im too lazy to fix
+			if (location.hostname === 'www.afkdev.me') {
+				location.replace('https://afkdev.me' + location.pathname + location.search + location.hash);
+			}
+
 			addEventListener('unhandledrejection', function (event) {
 				var message = (event.reason && event.reason.message) || '';
 				if (!/dynamically imported module|Importing a module script failed/i.test(message)) return;
