@@ -264,7 +264,7 @@ export function createBounce(stage) {
     }
   }
 
-  function registerHit(itemA, itemB, timestamp) {
+  function registerHit(itemA, itemB, timestamp, impactSpeed) {
     const key =
       Math.min(itemA.index, itemB.index) +
       ":" +
@@ -286,6 +286,11 @@ export function createBounce(stage) {
 
     const deltaTime = (timestamp - lastTimestamp) / 1000;
     const staticObstacles = getStaticObstacles();
+    // impact speed comes from here
+    const velocities = items.map((item) => ({
+      velocityX: item.velocityX,
+      velocityY: item.velocityY,
+    }));
 
     lastTimestamp = timestamp;
 
@@ -310,7 +315,16 @@ export function createBounce(stage) {
       renderItem(item);
 
       for (const other of hits) {
-        registerHit(item, other, timestamp);
+        const a = velocities[item.index];
+        const b = velocities[other.index];
+
+        registerHit(
+          item,
+          other,
+          timestamp,
+          // trigonometry :glee:
+          Math.hypot(a.velocityX - b.velocityX, a.velocityY - b.velocityY),
+        );
       }
     }
 
