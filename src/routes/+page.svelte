@@ -1,6 +1,7 @@
 <script>
   import { createBounce } from "../lib/bounce.js";
   import Hypercube from "../lib/Hypercube.svelte";
+  import "../lib/fight.css";
 
   let stage;
 

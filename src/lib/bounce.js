@@ -279,13 +279,16 @@ export function createBounce(stage) {
     lastHitAt.set(key, timestamp);
     const damage = Math.min(Math.max(Math.round(impactSpeed / 40), 4), 30);
 
-    itemA.hp -= damage;
-    itemB.hp -= damage;
+    itemA.hp = Math.max(itemA.hp - damage, 0);
+    itemB.hp = Math.max(itemB.hp - damage, 0);
+
     for (const item of [itemA, itemB]) {
       item.velocityX *= 1.3;
       item.velocityY *= 1.3;
     }
-    console.log(damage, itemA.hp, itemB.hp);
+    for (const item of [itemA, itemB]) {
+      item.bar.firstChild.style.width = (item.hp / START_HP) * 100 + "%";
+    }
   }
 
   function step(timestamp) {
@@ -371,6 +374,13 @@ export function createBounce(stage) {
     }
   }
 
+  for (const item of items) {
+    item.bar = document.createElement("div");
+    item.bar.className = "fight-hp";
+    item.bar.innerHTML = '<span class="hp"></span>';
+    item.element.appendChild(item.bar);
+  }
+
   window.addEventListener("resize", handleResize);
 
   startAnimation();
@@ -379,5 +389,9 @@ export function createBounce(stage) {
     window.cancelAnimationFrame(animationFrameId);
     window.removeEventListener("resize", handleResize);
     document.body.classList.remove("is-animated");
+
+    for (const item of items) {
+      item.bar.remove();
+    }
   };
 }

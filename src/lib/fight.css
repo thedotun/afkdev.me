@@ -1,0 +1,17 @@
+.fight-hp {
+    position: absolute;
+    bottom: calc(100% + 0.4rem);
+    left: 0;
+    right: 0;
+    height: 0.5rem;
+    background: rgba(23, 50, 77, 0.3);
+    pointer-events: none;
+}
+
+.hp {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: #17324d;
+    transition: width 0.12s ease-out;
+}
