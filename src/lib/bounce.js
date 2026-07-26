@@ -1,5 +1,5 @@
 const obstacleSelector = "[hit]";
-
+const START_HP = 100;
 export function createBounce(stage) {
   const items = [...stage.querySelectorAll("[data-logo-item]")].map(
     (element, index) => ({
@@ -7,6 +7,7 @@ export function createBounce(stage) {
       index,
       x: 0,
       y: 0,
+      hp: START_HP,
       velocityX: 0,
       velocityY: 0,
       isPlaced: false,
@@ -276,7 +277,15 @@ export function createBounce(stage) {
     }
 
     lastHitAt.set(key, timestamp);
-    // damage goes here
+    const damage = Math.min(Math.max(Math.round(impactSpeed / 40), 4), 30);
+
+    itemA.hp -= damage;
+    itemB.hp -= damage;
+    for (const item of [itemA, itemB]) {
+      item.velocityX *= 1.3;
+      item.velocityY *= 1.3;
+    }
+    console.log(damage, itemA.hp, itemB.hp);
   }
 
   function step(timestamp) {
